@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        #question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        #answer {
+            font-size: 1em;
+            margin-top: 20px;
+            color: green;
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <div id="question">Loading...</div>
+        <button onclick="revealAnswer()">Reveal Answer</button>
+        <div id="answer"></div>
+        <button onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentQuestionIndex = 0;
+
+        // Function to load JSON data from the file
+        async function loadQuestions() {
+            try {
+                const response = await fetch('vatandasliktesti_qa_only.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                questions = await response.json();
+                loadQuestion();
+            } catch (error) {
+                console.error('Error loading JSON file:', error);
+                document.getElementById('question').textContent = 'Failed to load questions.';
+            }
+        }
+
+        function loadQuestion() {
+            if (questions.length > 0) {
+                const questionElement = document.getElementById('question');
+                const answerElement = document.getElementById('answer');
+
+                // Load the current question and hide the answer
+                questionElement.textContent = questions[currentQuestionIndex].question;
+                answerElement.style.display = 'none';
+                answerElement.textContent = questions[currentQuestionIndex].answer;
+            }
+        }
+
+        function revealAnswer() {
+            const answerElement = document.getElementById('answer');
+            answerElement.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            // Move to the next question or loop back to the first one
+            currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+            loadQuestion();
+        }
+
+        // Load the questions from the JSON file on page load
+        window.onload = loadQuestions;
+    </script>
+
+</body>
+</html>
